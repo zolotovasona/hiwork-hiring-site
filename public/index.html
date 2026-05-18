@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HIWorkForHR - Подать заявку</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #F0F0FF 0%, #E8E8FF 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #7B8CFF 0%, #4CAF50 100%);
+            border-radius: 20px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(123, 140, 255, 0.3);
+        }
+
+        h1 {
+            color: #1A1A2E;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            color: #1A1A2E;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #E0E0E0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: #FAFAFA;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #7B8CFF;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(123, 140, 255, 0.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #7B8CFF 0%, #4CAF50 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(123, 140, 255, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .success-message {
+            background: #E8F5E9;
+            color: #2E7D32;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message {
+            background: #FFEBEE;
+            color: #C62828;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .footer {
+            text-align: center;
+            color: #999;
+            font-size: 14px;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 600px) {
+            .form-card {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">W</div>
+            <h1>HIWorkForHR</h1>
+            <p class="subtitle">Присоединяйтесь к нашей команде</p>
+        </div>
+
+        <div class="form-card">
+            <div class="success-message" id="successMsg">
+                ✅ Заявка успешно отправлена! Мы свяжемся с вами soon.
+            </div>
+            <div class="error-message" id="errorMsg">
+                ❌ Произошла ошибка. Попробуйте ещё раз.
+            </div>
+
+            <form id="applicationForm">
+                <div class="form-group">
+                    <label for="fullName">ФИО *</label>
+                    <input type="text" id="fullName" name="full_name" required placeholder="Иванов Иван Иванович">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" name="email" required placeholder="example@mail.ru">
+                </div>
+
+                <div class="form-group">
+                    <label for="careerTrack">Карьерный трек *</label>
+                    <select id="careerTrack" name="career_track" required>
+                        <option value="">Выберите трек...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="department">Отдел *</label>
+                    <input type="text" id="department" name="department" required placeholder="Отдел мобильной разработки">
+                </div>
+
+                <div class="form-group">
+                    <label for="experience">Опыт работы *</label>
+                    <select id="experience" name="experience" required>
+                        <option value="">Выберите...</option>
+                        <option value="<1">Меньше 1 года</option>
+                        <option value="1">1 год</option>
+                        <option value="2">2 года</option>
+                        <option value="3">3 года</option>
+                        <option value="4">4 года</option>
+                        <option value="5">5 лет</option>
+                        <option value="6">6 лет</option>
+                        <option value="7+">7+ лет</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="submit-btn">📤 Отправить заявку</button>
+            </form>
+        </div>
+
+        <div class="footer">
+            <p>© 2026 HIWorkForHR. Все права защищены.</p>
+        </div>
+    </div>
+
+    <script>
+        // Загрузка карьерных треков
+        async function loadTracks() {
+            try {
+                const response = await fetch('/api/tracks');
+                const data = await response.json();
+                const select = document.getElementById('careerTrack');
+                
+                data.tracks.forEach(track => {
+                    const option = document.createElement('option');
+                    option.value = track;
+                    option.textContent = track;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Ошибка загрузки треков:', error);
+            }
+        }
+
+        // Отправка формы
+        document.getElementById('applicationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                full_name: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                career_track: document.getElementById('careerTrack').value,
+                department: document.getElementById('department').value,
+                experience: document.getElementById('experience').value
+            };
+
+            try {
+                const response = await fetch('/api/apply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('successMsg').style.display = 'block';
+                    document.getElementById('errorMsg').style.display = 'none';
+                    document.getElementById('applicationForm').reset();
+                    setTimeout(() => {
+                        document.getElementById('successMsg').style.display = 'none';
+                    }, 5000);
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (error) {
+                document.getElementById('errorMsg').style.display = 'block';
+                document.getElementById('successMsg').style.display = 'none';
+                setTimeout(() => {
+                    document.getElementById('errorMsg').style.display = 'none';
+                }, 5000);
+            }
+        });
+
+        // Инициализация
+        loadTracks();
+    </script>
+</body>
+</html>

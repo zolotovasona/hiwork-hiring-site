@@ -48,10 +48,12 @@ db.serialize(() => {
 
 // Email конфигурация
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.mail.ru',
+  port: 587,
+  secure: false, // true для порта 465
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+    user: process.env.EMAIL_USER,  // твоя почта @mail.ru
+    pass: process.env.EMAIL_PASS   // пароль из "Пароли для внешних приложений"
   },
   tls: {
     rejectUnauthorized: false

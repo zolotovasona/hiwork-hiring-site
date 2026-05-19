@@ -49,8 +49,8 @@ db.serialize(() => {
 // Email конфигурация
 const transporter = nodemailer.createTransport({
   host: 'smtp.mail.ru',
-  port: 587,
-  secure: false, // true для порта 465
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.EMAIL_USER,  // твоя почта @mail.ru
     pass: process.env.EMAIL_PASS   // пароль из "Пароли для внешних приложений"

@@ -144,8 +144,7 @@ app.post('/api/interview/:id', async (req, res) => {
   });
 });
 
-// 🎉 API: Принять на работу + QR код
-// 🎉 API: Принять на работу + QR код (ОДНОРАЗОВЫЙ)
+// 🎉 API: Принять на работу + ОДНОРАЗОВЫЙ 7-значный код
 app.post('/api/hire/:id', async (req, res) => {
   const { id } = req.params;
   console.log(`🎉 Принятие на работу: ID ${id}`);
@@ -153,62 +152,50 @@ app.post('/api/hire/:id', async (req, res) => {
   db.get('SELECT * FROM applications WHERE id = ?', [id], async (err, row) => {
     if (err || !row) return res.status(404).json({ error: 'Заявка не найдена' });
 
-    // 🔒 ЗАЩИТА: Если код уже есть — НЕ генерируем заново
-    if (row.qr_code) {
-      console.log(`⚠️ QR-код уже существует для ID ${id}. Возвращаем существующий.`);
-      const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(row.qr_code)}`;
-      
-      const emailSent = await sendEmail(row.email, 'Ваш код регистрации - HIWorkForHR', `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2>Здравствуйте, ${row.full_name}!</h2>
-          <p>Вы уже приняты на работу. Ваш код для регистрации:</p>
-          <div style="text-align: center; margin: 20px 0;">
-            <img src="${qrImageUrl}" alt="QR Code" style="width: 200px; height: 200px; border: 3px solid #7B8CFF; border-radius: 12px;" />
-          </div>
-          <p style="text-align: center; font-family: monospace; font-size: 16px; background: #F5F3FF; padding: 12px; border-radius: 8px; border: 1px dashed #7B8CFF; word-break: break-all;">
-            🔑 ${row.qr_code}
-          </p>
-          <p style="font-size: 12px; color: #666; text-align: center;"><em>Код одноразовый.</em></p>
-        </div>
-      `);
-      return res.json({ success: true, message: 'Код уже был создан ранее', qrCode: row.qr_code, emailSent });
+    let qrData = row.qr_code;
+    
+    // 🔒 Генерируем ТОЛЬКО если кода ещё нет
+    if (!qrData) {
+      qrData = String(Math.floor(1000000 + Math.random() * 9000000)); // 7 цифр: 1000000-9999999
+      console.log(`🔑 Сгенерирован новый 7-значный код: ${qrData}`);
+    } else {
+      console.log(`🔑 Возвращаем существующий код: ${qrData}`);
     }
 
-    // Генерация нового уникального кода
-    const qrData = `HIWORK_${id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    // Сохраняем в БД (если новый)
+    const updateSql = !row.qr_code 
+      ? 'UPDATE applications SET status = ?, qr_code = ? WHERE id = ?'
+      : 'UPDATE applications SET status = ? WHERE id = ?';
+    const params = !row.qr_code ? ['hired', qrData, id] : ['hired', id];
 
-    // Сохраняем статус и код в БД
-    db.run('UPDATE applications SET status = ?, qr_code = ? WHERE id = ?', ['hired', qrData, id], async (dbErr) => {
+    db.run(updateSql, params, async (dbErr) => {
       if (dbErr) return res.status(500).json({ error: dbErr.message });
 
-      console.log(`📧 Отправляю QR-код на: ${row.email}`);
-      
-      // Используем публичный API для картинки (надежно для Gmail/Outlook)
+      // Картинка QR через внешний API (гарантированно работает в Gmail/Outlook)
       const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrData)}`;
 
       const emailSent = await sendEmail(row.email, 'Поздравляем! Вы приняты на работу - HIWorkForHR', `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2 style="color: #1A1A2E;">Здравствуйте, ${row.full_name}!</h2>
-          <p>Поздравляем! Вы приняты на работу на позицию <strong>${row.career_track}</strong>.</p>
-          <p>Ваш персональный код для регистрации в приложении:</p>
+          <h2>Здравствуйте, ${row.full_name}!</h2>
+          <p>Вы приняты на позицию <strong>${row.career_track}</strong>.</p>
           
           <div style="text-align: center; margin: 25px 0;">
-            <img src="${qrImageUrl}" alt="QR Code" style="width: 220px; height: 220px; border: 3px solid #7B8CFF; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+            <img src="${qrImageUrl}" alt="QR Code" style="width: 200px; height: 200px; border: 3px solid #7B8CFF; border-radius: 10px;" />
           </div>
 
-          <div style="text-align: center;">
-            <p style="font-family: monospace; font-size: 18px; background: #F5F3FF; padding: 15px; border-radius: 8px; border: 2px dashed #7B8CFF; word-break: break-all; color: #333;">
+          <div style="text-align: center; background: #F5F3FF; padding: 12px; border-radius: 8px; border: 2px dashed #7B8CFF;">
+            <p style="margin: 0; font-family: monospace; font-size: 22px; font-weight: bold; color: #1A1A2E; letter-spacing: 2px;">
               🔑 ${qrData}
             </p>
-            <p style="font-size: 13px; color: #666; margin-top: 8px;">
-              <em>Этот код одноразовый. Отсканируйте QR или введите цифры вручную при регистрации.</em>
+            <p style="margin: 8px 0 0; font-size: 13px; color: #666;">
+              Одноразовый код для регистрации в приложении
             </p>
           </div>
         </div>
       `);
 
-      console.log(emailSent ? '✅ Сотрудник принят, QR отправлен' : '⚠️ Принят, но email не ушёл');
-      res.json({ success: true, message: 'Сотрудник принят', emailSent, qrCode: qrData });
+      console.log(emailSent ? '✅ Письмо с кодом отправлено' : '⚠️ Код сохранён, но письмо не ушло');
+      res.json({ success: true, message: 'Сотрудник принят', qrCode: qrData, qrImageUrl, emailSent });
     });
   });
 });

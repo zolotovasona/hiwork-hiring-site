@@ -3,273 +3,270 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HIWorkForHR - Подать заявку</title>
+    <title>HIWork - Подача заявки</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #F0F0FF 0%, #E8E8FF 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
             max-width: 600px;
             margin: 0 auto;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
-
-        .header {
-            text-align: center;
-            padding: 40px 0;
-        }
-
-        .logo {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #7B8CFF 0%, #4CAF50 100%);
+        .container {
+            background: white;
+            padding: 40px;
             border-radius: 20px;
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            color: white;
-            box-shadow: 0 4px 15px rgba(123, 140, 255, 0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
-
         h1 {
+            text-align: center;
             color: #1A1A2E;
-            font-size: 28px;
             margin-bottom: 10px;
         }
-
         .subtitle {
+            text-align: center;
             color: #666;
-            font-size: 16px;
+            margin-bottom: 30px;
         }
-
-        .form-card {
-            background: white;
-            border-radius: 16px;
-            padding: 32px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        .form-group {
             margin-bottom: 20px;
         }
-
-        .form-group {
-            margin-bottom: 24px;
-        }
-
         label {
             display: block;
-            color: #1A1A2E;
-            font-weight: 600;
             margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+        .file-input-label {
+            display: block;
+            padding: 12px;
+            background: #f5f5f5;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .file-input-label:hover {
+            background: #e8e8e8;
+            border-color: #667eea;
+        }
+        .file-name {
+            margin-top: 8px;
+            color: #667eea;
             font-size: 14px;
         }
-
-        input, select {
+        button {
             width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #E0E0E0;
-            border-radius: 12px;
-            font-size: 16px;
-            transition: all 0.3s;
-            background: #FAFAFA;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #7B8CFF;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(123, 140, 255, 0.1);
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #7B8CFF 0%, #4CAF50 100%);
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s;
         }
-
-        .submit-btn:hover {
+        button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(123, 140, 255, 0.4);
         }
-
-        .submit-btn:active {
-            transform: translateY(0);
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
-
-        .success-message {
-            background: #E8F5E9;
-            color: #2E7D32;
-            padding: 16px;
-            border-radius: 12px;
-            text-align: center;
-            margin-bottom: 20px;
+        .success {
             display: none;
-        }
-
-        .error-message {
-            background: #FFEBEE;
-            color: #C62828;
-            padding: 16px;
-            border-radius: 12px;
             text-align: center;
-            margin-bottom: 20px;
-            display: none;
+            padding: 20px;
+            background: #d4edda;
+            color: #155724;
+            border-radius: 8px;
+            margin-top: 20px;
         }
-
-        .footer {
-            text-align: center;
-            color: #999;
+        .error {
+            color: #dc3545;
             font-size: 14px;
-            margin-top: 40px;
-        }
-
-        @media (max-width: 600px) {
-            .form-card {
-                padding: 24px;
-            }
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <div class="logo">W</div>
-            <h1>HIWorkForHR</h1>
-            <p class="subtitle">Присоединяйтесь к нашей команде</p>
-        </div>
-
-        <div class="form-card">
-            <div class="success-message" id="successMsg">
-                ✅ Заявка успешно отправлена! Мы свяжемся с вами soon.
-            </div>
-            <div class="error-message" id="errorMsg">
-                ❌ Произошла ошибка. Попробуйте ещё раз.
+        <h1>🚀 HIWork</h1>
+        <p class="subtitle">Присоединяйся к нашей команде!</p>
+        
+        <form id="applicationForm">
+            <div class="form-group">
+                <label for="fullName">ФИО *</label>
+                <input type="text" id="fullName" name="fullName" required>
             </div>
 
-            <form id="applicationForm">
-                <div class="form-group">
-                    <label for="fullName">ФИО *</label>
-                    <input type="text" id="fullName" name="full_name" required placeholder="Иванов Иван Иванович">
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="careerTrack">Карьерный трек *</label>
+                <select id="careerTrack" name="careerTrack" required>
+                    <option value="">Выберите трек</option>
+                    <option value="Разработка">Разработка</option>
+                    <option value="Дизайн">Дизайн</option>
+                    <option value="Маркетинг">Маркетинг</option>
+                    <option value="Продажи">Продажи</option>
+                    <option value="Поддержка">Поддержка</option>
+                    <option value="Управление">Управление</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="department">Отдел</label>
+                <input type="text" id="department" name="department" placeholder="Например: IT, HR, Sales">
+            </div>
+
+            <div class="form-group">
+                <label for="experience">Опыт работы (лет)</label>
+                <input type="number" id="experience" name="experience" min="0" max="50" placeholder="0">
+            </div>
+
+            <div class="form-group">
+                <label for="aboutMe">О себе *</label>
+                <textarea id="aboutMe" name="aboutMe" required 
+                    placeholder="Расскажите о себе, ваших навыках и почему вы хотите работать у нас..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Резюме (PDF, DOC, DOCX)</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx">
+                    <label for="resume" class="file-input-label">
+                        📎 Нажмите для загрузки резюме
+                    </label>
+                    <div class="file-name" id="resumeName"></div>
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <label for="email">Email *</label>
-                    <input type="email" id="email" name="email" required placeholder="example@mail.ru">
+            <div class="form-group">
+                <label>Портфолио (PDF, ZIP, ссылки на работы)</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="portfolio" name="portfolio" accept=".pdf,.zip,.rar">
+                    <label for="portfolio" class="file-input-label">
+                        📁 Нажмите для загрузки портфолио
+                    </label>
+                    <div class="file-name" id="portfolioName"></div>
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <label for="careerTrack">Карьерный трек *</label>
-                    <select id="careerTrack" name="career_track" required>
-                        <option value="">Выберите трек...</option>
-                    </select>
+            <div class="form-group">
+                <label>Фото профиля (JPG, PNG)</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="photo" name="photo" accept="image/*">
+                    <label for="photo" class="file-input-label">
+                        📷 Нажмите для загрузки фото
+                    </label>
+                    <div class="file-name" id="photoName"></div>
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <label for="department">Отдел *</label>
-                    <input type="text" id="department" name="department" required placeholder="Отдел мобильной разработки">
-                </div>
+            <button type="submit" id="submitBtn">Отправить заявку</button>
+        </form>
 
-                <div class="form-group">
-                    <label for="experience">Опыт работы *</label>
-                    <select id="experience" name="experience" required>
-                        <option value="">Выберите...</option>
-                        <option value="<1">Меньше 1 года</option>
-                        <option value="1">1 год</option>
-                        <option value="2">2 года</option>
-                        <option value="3">3 года</option>
-                        <option value="4">4 года</option>
-                        <option value="5">5 лет</option>
-                        <option value="6">6 лет</option>
-                        <option value="7+">7+ лет</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="submit-btn">📤 Отправить заявку</button>
-            </form>
-        </div>
-
-        <div class="footer">
-            <p>© 2026 HIWorkForHR. Все права защищены.</p>
+        <div class="success" id="successMsg">
+            ✅ Заявка успешно отправлена!<br>
+            Мы свяжемся с вами в ближайшее время.
         </div>
     </div>
 
     <script>
-        // Загрузка карьерных треков
-        async function loadTracks() {
-            try {
-                const response = await fetch('/api/tracks');
-                const data = await response.json();
-                const select = document.getElementById('careerTrack');
-                
-                data.tracks.forEach(track => {
-                    const option = document.createElement('option');
-                    option.value = track;
-                    option.textContent = track;
-                    select.appendChild(option);
-                });
-            } catch (error) {
-                console.error('Ошибка загрузки треков:', error);
-            }
-        }
-
-        // Отправка формы
-        document.getElementById('applicationForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const formData = {
-                full_name: document.getElementById('fullName').value,
-                email: document.getElementById('email').value,
-                career_track: document.getElementById('careerTrack').value,
-                department: document.getElementById('department').value,
-                experience: document.getElementById('experience').value
-            };
-
-            try {
-                const response = await fetch('/api/apply', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData)
-                });
-
-                const data = await response.json();
-                
-                if (data.success) {
-                    document.getElementById('successMsg').style.display = 'block';
-                    document.getElementById('errorMsg').style.display = 'none';
-                    document.getElementById('applicationForm').reset();
-                    setTimeout(() => {
-                        document.getElementById('successMsg').style.display = 'none';
-                    }, 5000);
-                } else {
-                    throw new Error(data.error);
-                }
-            } catch (error) {
-                document.getElementById('errorMsg').style.display = 'block';
-                document.getElementById('successMsg').style.display = 'none';
-                setTimeout(() => {
-                    document.getElementById('errorMsg').style.display = 'none';
-                }, 5000);
-            }
+        // Показ имён загруженных файлов
+        document.getElementById('resume').addEventListener('change', function(e) {
+            document.getElementById('resumeName').textContent = e.target.files[0]?.name || '';
+        });
+        document.getElementById('portfolio').addEventListener('change', function(e) {
+            document.getElementById('portfolioName').textContent = e.target.files[0]?.name || '';
+        });
+        document.getElementById('photo').addEventListener('change', function(e) {
+            document.getElementById('photoName').textContent = e.target.files[0]?.name || '';
         });
 
-        // Инициализация
-        loadTracks();
+        // Отправка формы
+        document.getElementById('applicationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const formData = new FormData();
+            
+            // Текстовые поля
+            formData.append('fullName', document.getElementById('fullName').value);
+            formData.append('email', document.getElementById('email').value);
+            formData.append('careerTrack', document.getElementById('careerTrack').value);
+            formData.append('department', document.getElementById('department').value);
+            formData.append('experience', document.getElementById('experience').value);
+            formData.append('aboutMe', document.getElementById('aboutMe').value);
+            
+            // Файлы
+            const resume = document.getElementById('resume').files[0];
+            const portfolio = document.getElementById('portfolio').files[0];
+            const photo = document.getElementById('photo').files[0];
+            
+            if (resume) formData.append('resume', resume);
+            if (portfolio) formData.append('portfolio', portfolio);
+            if (photo) formData.append('photo', photo);
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Отправка...';
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/apply', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('applicationForm').style.display = 'none';
+                    document.getElementById('successMsg').style.display = 'block';
+                } else {
+                    alert('Ошибка: ' + result.error);
+                }
+            } catch (error) {
+                alert('Ошибка отправки: ' + error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Отправить заявку';
+            }
+        });
     </script>
 </body>
 </html>

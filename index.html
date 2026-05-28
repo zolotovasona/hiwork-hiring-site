@@ -279,8 +279,10 @@
             
             try {
                 const response = await fetch('https://hiwork-api.onrender.com/api/applications', {
-                    method: 'POST',
-                    body: formData
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(formData)
                 });
                 
                 const result = await response.json();

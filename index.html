@@ -278,22 +278,31 @@
             submitBtn.textContent = 'Отправка...';
             
             try {
+                // ✅ ПРАВИЛЬНАЯ ОТПРАВКА С ФАЙЛАМИ:
+                // 1. Не указываем headers (браузер сам поставит multipart/form-data)
+                // 2. Отправляем formData напрямую, БЕЗ JSON.stringify
                 const response = await fetch('https://hiwork-api.onrender.com/api/applications', {
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(formData)
+                    method: 'POST',
+                    body: formData  // ✅ Просто formData, ничего не строгируем
                 });
-                
-                const result = await response.json();
-                
+    
+                // Пробуем распарсить ответ (он может быть и не JSON)
+                let result;
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.includes("application/json")) {
+                    result = await response.json();
+                } else {
+                    result = { message: await response.text() };
+                }
+    
                 if (response.ok) {
                     document.getElementById('applicationForm').style.display = 'none';
                     document.getElementById('successMsg').style.display = 'block';
                 } else {
-                    alert('Ошибка: ' + result.error);
+                    alert('Ошибка: ' + (result.error || result.message || 'Неизвестная ошибка'));
                 }
             } catch (error) {
+                console.error('Fetch error:', error);
                 alert('Ошибка отправки: ' + error.message);
             } finally {
                 submitBtn.disabled = false;

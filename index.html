@@ -242,72 +242,38 @@
         });
 
         // Отправка формы
-        document.getElementById('applicationForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const submitBtn = document.getElementById('submitBtn');
-            const formData = new FormData();
-            
-            // Текстовые поля
-            formData.append('fullName', document.getElementById('fullName').value);
-            formData.append('email', document.getElementById('email').value);
-            formData.append('careerTrack', document.getElementById('careerTrack').value);
-            formData.append('department', document.getElementById('department').value);
-            formData.append('experience', document.getElementById('experience').value);
-            formData.append('aboutMe', document.getElementById('aboutMe').value);
-            
-            // ✅ Резюме: текст ИЛИ файл
-            const resumeText = document.getElementById('resumeText').value.trim();
-            const resumeFile = document.getElementById('resumeFile').files[0];
-            
-            if (resumeText) {
-                formData.append('resumeText', resumeText);
-            }
-            if (resumeFile) {
-                formData.append('resume', resumeFile);
-            }
-            
-            // Портфолио и фото
-            const portfolio = document.getElementById('portfolio').files[0];
-            const photo = document.getElementById('photo').files[0];
-            
-            if (portfolio) formData.append('portfolio', portfolio);
-            if (photo) formData.append('photo', photo);
-            
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Отправка...';
-            
-            try {
-                // ✅ ПРАВИЛЬНАЯ ОТПРАВКА С ФАЙЛАМИ:
-                const response = await fetch('https://hiwork-api.onrender.com/api/applications', {
-                    method: 'POST',  // ✅ Явно указываем POST
-                    body: formData   // ✅ Отправляем formData БЕЗ JSON.stringify
-                    // ✅ НЕ указываем headers - браузер сам поставит multipart/form-data
-                });
-                
-                // Пробуем распарсить ответ
-                let result;
-                const contentType = response.headers.get("content-type");
-                if (contentType && contentType.includes("application/json")) {
-                    result = await response.json();
-                } else {
-                    result = { message: await response.text() };
-                }
-                
-                if (response.ok) {
-                    document.getElementById('applicationForm').style.display = 'none';
-                    document.getElementById('successMsg').style.display = 'block';
-                } else {
-                    alert('Ошибка: ' + (result.error || result.message || 'Неизвестная ошибка'));
-                }
-            } catch (error) {
-                console.error('Fetch error:', error);
-                alert('Ошибка отправки: ' + error.message);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Отправить заявку';
-            }
+document.getElementById('applicationForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = this.querySelector('button[type="submit"]');
+    const originalText = btn.textContent;
+    btn.textContent = '⏳ Отправка...';
+    btn.disabled = true;
+
+    try {
+        const formData = new FormData(this);
+        
+        // ✅ Отправляем на твой бэкенд
+        const response = await fetch('https://hiwork-api.onrender.com/api/applications', {
+            method: 'POST',
+            body: formData
         });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            alert('✅ Заявка успешно отправлена!');
+            this.reset();
+        } else {
+            alert('❌ Ошибка: ' + (data.error || 'Неизвестная ошибка'));
+        }
+    } catch (err) {
+        console.error(err);
+        alert(' Нет связи с сервером. Проверь интернет или попробуй позже.');
+    } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+    }
+});
     </script>
     <script>
 // Загрузка доступных треков и отделов для выпадающих списков

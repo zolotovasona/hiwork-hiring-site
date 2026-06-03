@@ -252,11 +252,26 @@ document.getElementById('applicationForm').addEventListener('submit', async func
     try {
         const formData = new FormData(this);
         
-        // ✅ Отправляем на твой бэкенд
-        const response = await fetch('https://hiwork-api.onrender.com/api/applications', {
-            method: 'POST',
-            body: formData
-        });
+    async function fetchWithRetry(url, options, maxRetries = 3) {
+        for (let i = 0; i < maxRetries; i++) {
+            try {
+                const response = await fetch(url, options);
+                if (response.ok) return response;
+            } catch (error) {
+                console.log(`Попытка ${i + 1} не удалась, пробуем снова...`);
+                if (i < maxRetries - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 2000)); // Ждём 2 секунды
+                }
+            }
+        }
+        throw new Error('Не удалось отправить заявку после нескольких попыток');
+    }
+
+    // Используй эту функцию вместо обычного fetch:
+    const response = await fetchWithRetry('https://hiwork-api.onrender.com/api/applications', {
+        method: 'POST',
+        body: formData
+    });
 
         const data = await response.json();
 

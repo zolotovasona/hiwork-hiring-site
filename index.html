@@ -267,7 +267,10 @@ document.getElementById('applicationForm').addEventListener('submit', async func
         throw new Error('Не удалось отправить заявку после нескольких попыток');
     }
 
-    // Используй эту функцию вместо обычного fetch:
+    const btn = this.querySelector('button[type="submit"]');
+    btn.textContent = '⏳ Отправка (это может занять до 1 минуты)...';
+    btn.disabled = true;  
+
     const response = await fetchWithRetry('https://hiwork-api.onrender.com/api/applications', {
         method: 'POST',
         body: formData
@@ -285,7 +288,7 @@ document.getElementById('applicationForm').addEventListener('submit', async func
         console.error(err);
         alert(' Нет связи с сервером. Проверь интернет или попробуй позже.');
     } finally {
-        btn.textContent = originalText;
+        btn.textContent = originalBtnText;
         btn.disabled = false;
     }
 });

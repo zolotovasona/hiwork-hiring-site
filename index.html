@@ -252,15 +252,33 @@ document.getElementById('applicationForm').addEventListener('submit', async func
     try {
         const formData = new FormData(this);
         
+    async function fetchWithTimeout(url, options, timeout = 30000) {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeout);
+    
+        try {
+            const response = await fetch(url, {
+                ...options,
+                signal: controller.signal
+            });
+            clearTimeout(id);
+            return response;
+        } catch (error) {
+            clearTimeout(id);
+            throw error;
+        }    
+    }    
+
     async function fetchWithRetry(url, options, maxRetries = 3) {
         for (let i = 0; i < maxRetries; i++) {
             try {
-                const response = await fetch(url, options);
+                btn.textContent = `⏳ Попытка ${i + 1} из ${maxRetries}...`;
+                const response = await fetchWithTimeout(url, options, 30000); // 30 секунд
                 if (response.ok) return response;
             } catch (error) {
-                console.log(`Попытка ${i + 1} не удалась, пробуем снова...`);
+                console.log(`Попытка ${i + 1} не удалась: ${error.message}`);
                 if (i < maxRetries - 1) {
-                    await new Promise(resolve => setTimeout(resolve, 2000)); // Ждём 2 секунды
+                    await new Promise(resolve => setTimeout(resolve, 2000));
                 }
             }
         }

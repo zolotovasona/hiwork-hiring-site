@@ -244,36 +244,36 @@
         // Отправка формы
 document.getElementById('applicationForm').addEventListener('submit', async function(e) {
     e.preventDefault();
-    const btn = this.querySelector('button[type="submit"]');
-    const originalText = btn.textContent;
-    btn.textContent = '⏳ Отправка...';
-    btn.disabled = true;
-
-    try {
-        const formData = new FormData(this);
-        
-    async function fetchWithTimeout(url, options, timeout = 30000) {
-        const controller = new AbortController();
-        const id = setTimeout(() => controller.abort(), timeout);
     
-        try {
-            const response = await fetch(url, {
-                ...options,
-                signal: controller.signal
-            });
-            clearTimeout(id);
-            return response;
-        } catch (error) {
-            clearTimeout(id);
-            throw error;
-        }    
-    }    
-
+    const formData = new FormData(this);
+    const btn = this.querySelector('button[type="submit"]');
+    const originalBtnText = btn.textContent; // 🟢 СОХРАНИЛИ текст кнопки
+    
+    // Функция fetch с таймаутом
+    async function fetchWithTimeout(url, options, timeout = 30000) {
+        return new Promise((resolve, reject) => {
+            const timeoutId = setTimeout(() => {
+                reject(new Error('Превышено время ожидания (30 сек)'));
+            }, timeout);
+            
+            fetch(url, options)
+                .then(response => {
+                    clearTimeout(timeoutId);
+                    resolve(response);
+                })
+                .catch(error => {
+                    clearTimeout(timeoutId);
+                    reject(error);
+                });
+        });
+    }
+    
+    // Функция с повторными попытками
     async function fetchWithRetry(url, options, maxRetries = 3) {
         for (let i = 0; i < maxRetries; i++) {
             try {
                 btn.textContent = `⏳ Попытка ${i + 1} из ${maxRetries}...`;
-                const response = await fetchWithTimeout(url, options, 30000); // 30 секунд
+                const response = await fetchWithTimeout(url, options, 30000);
                 if (response.ok) return response;
             } catch (error) {
                 console.log(`Попытка ${i + 1} не удалась: ${error.message}`);
@@ -284,29 +284,29 @@ document.getElementById('applicationForm').addEventListener('submit', async func
         }
         throw new Error('Не удалось отправить заявку после нескольких попыток');
     }
-
-    const btn = this.querySelector('button[type="submit"]');
-    btn.textContent = '⏳ Отправка (это может занять до 1 минуты)...';
-    btn.disabled = true;  
-
-    const response = await fetchWithRetry('https://hiwork-api.onrender.com/api/applications', {
-        method: 'POST',
-        body: formData
-    });
-
+    
+    try {
+        btn.textContent = '⏳ Отправка...';
+        btn.disabled = true;
+        
+        const response = await fetchWithRetry('https://hiwork-api.onrender.com/api/applications', {
+            method: 'POST',
+            body: formData
+        });
+        
         const data = await response.json();
-
+        
         if (response.ok && data.success) {
             alert('✅ Заявка успешно отправлена!');
             this.reset();
         } else {
             alert('❌ Ошибка: ' + (data.error || 'Неизвестная ошибка'));
         }
-    } catch (err) {
-        console.error(err);
-        alert(' Нет связи с сервером. Проверь интернет или попробуй позже.');
+        
+    } catch (error) {
+        alert('❌ Ошибка: ' + error.message);
     } finally {
-        btn.textContent = originalBtnText;
+        btn.textContent = originalBtnText; // 🟢 ВОССТАНОВИЛИ текст
         btn.disabled = false;
     }
 });

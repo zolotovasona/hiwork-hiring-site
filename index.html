@@ -154,13 +154,7 @@
             <div class="form-group">
                 <label for="careerTrack">Карьерный трек *</label>
                 <select id="careerTrack" name="careerTrack" required>
-                    <option value="">Выберите трек</option>
-                    <option value="Разработка">Разработка</option>
-                    <option value="Дизайн">Дизайн</option>
-                    <option value="Маркетинг">Маркетинг</option>
-                    <option value="Продажи">Продажи</option>
-                    <option value="Поддержка">Поддержка</option>
-                    <option value="Управление">Управление</option>
+                    <option value="">Загрузка треков...</option>
                 </select>
             </div>
 
@@ -287,37 +281,34 @@
 
         async function loadAvailableOptions() {
             try {
-                const response = await fetch('https://hiwork-api.onrender.com/api/applications/options');
-                if (!response.ok) throw new Error('Не удалось загрузить опции');
-                const data = await response.json();
-                
+                // ✅ Загружаем карьерные треки с нового endpoint
+                const tracksResponse = await fetch('https://hiwork-api.onrender.com/api/career-tracks');
+                if (!tracksResponse.ok) throw new Error('Не удалось загрузить треки');
+                const tracks = await tracksResponse.json();
+        
                 const trackSelect = document.getElementById('careerTrack');
                 trackSelect.innerHTML = '<option value="">Выберите трек</option>';
-                if (data.careerTracks?.length > 0) {
-                    data.careerTracks.forEach(track => {
+        
+                if (tracks.length > 0) {
+                    tracks.forEach(track => {
                         const opt = document.createElement('option');
-                        opt.value = track; 
-                        opt.textContent = track;
+                        opt.value = track.name; 
+                        opt.textContent = track.name + ' (' + track.employeesCount + ' чел.)';  // ✅ Показываем количество сотрудников
                         trackSelect.appendChild(opt);
                     });
                 } else {
                     trackSelect.innerHTML = '<option value="">Нет доступных треков</option>';
-                    trackSelect.disabled = true;
                 }
-                
+        
+                // ✅ Загружаем отделы (если нужно)
                 const deptSelect = document.getElementById('department');
                 deptSelect.innerHTML = '<option value="">Выберите отдел</option>';
-                if (data.departments?.length > 0) {
-                    data.departments.forEach(dept => {
-                        const opt = document.createElement('option');
-                        opt.value = dept; 
-                        opt.textContent = dept;
-                        deptSelect.appendChild(opt);
-                    });
-                }
-                
+    
+        
             } catch (err) {
                 console.error('Ошибка загрузки опций:', err);
+                const trackSelect = document.getElementById('careerTrack');
+                trackSelect.innerHTML = '<option value="">Ошибка загрузки</option>';
             }
         }
         
